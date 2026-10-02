@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicio Social - RentaGan</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="barra-navegacion">
+        <div class="logo-container">
+            <h1>Servicio Social</h1>
+            <h2><span class="destacado">RentaGan</span></h2>
+        </div>
+        <nav class="menu-nav">
+            <button class="btn-nav activo" onclick="cambiarVista('dashboard', event)">📊 Dashboard</button>
+            <button class="btn-nav" onclick="cambiarVista('historial', event)">📋 Historial</button>
+            <button class="btn-nav" onclick="cambiarVista('respaldos', event)">💾 Respaldos</button>
+        </nav>
+    </header>
+
+    <main class="contenedor-principal">
+
+        <!-- VISTA 1: DASHBOARD / RESUMEN -->
+        <section id="vista-dashboard" class="vista-seccion">
+            <div class="bienvenida-banner">
+                <p>Control y seguimiento de horas de servicio social vinculadas al rancho.</p>
+                <button id="btn-abrir-modal" class="boton">+ Registrar jornada</button>
+            </div>
+
+            <h3>Resumen general</h3>
+            <div class="resumen">
+                <div class="tarjeta">
+                    <h4>Horas requeridas</h4>
+                    <strong id="horas-requeridas">480</strong>
+                    <p>horas</p>
+                </div>
+
+                <div class="tarjeta">
+                    <h4>Horas realizadas</h4>
+                    <strong id="horas-realizadas">0</strong>
+                    <p>horas</p>
+                </div>
+
+                <div class="tarjeta">
+                    <h4>Horas restantes</h4>
+                    <strong id="horas-restantes">480</strong>
+                    <p>horas</p>
+                </div>
+            </div>
+
+            <!-- BARRA DE AVANCE -->
+            <div class="contenedor-avance">
+                <div class="encabezado-avance">
+                    <span>Progreso de titulación / liberación</span>
+                    <span id="texto-porcentaje">0%</span>
+                </div>
+                <div class="barra-base">
+                    <div id="barra-progreso" class="barra-relleno"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 2: HISTORIAL DE ACTIVIDADES -->
+        <section id="vista-historial" class="vista-seccion" style="display: none;">
+            <div class="cabecera-seccion">
+                <h3>Historial de Actividades Registradas</h3>
+                <button class="boton-secundario" onclick="document.getElementById('btn-abrir-modal').click()">+ Nueva Jornada</button>
+            </div>
+            
+            <div class="contenedor-tabla">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Horas</th>
+                            <th>Tipo de Actividad</th>
+                            <th>Lugar</th>
+                            <th>Descripción / Evidencia</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-cuerpo">
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VISTA 3: RESPALDOS Y DATOS -->
+        <section id="vista-respaldos" class="vista-seccion" style="display: none;">
+            <h3>Gestión de Respaldos (LocalStorage)</h3>
+            <div class="tarjeta-respaldo">
+                <p>Exporta o importa tus registros en formato JSON para mantener un respaldo seguro de tus horas de servicio social, igual que en tu sistema ganadero.</p>
+                <div class="grupo-botones-respaldo">
+                    <button class="boton" onclick="exportarDatos()">📥 Exportar Respaldos (JSON)</button>
+                    <label class="boton boton-archivo">
+                        📤 Importar Datos <input type="file" id="input-archivo" accept=".json" onchange="importarDatos(event)" style="display: none;">
+                    </label>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE REGISTRO -->
+    <div id="modal-registro" class="modal">
+        <div class="modal-contenido">
+            <span id="btn-cerrar" class="cerrar">&times;</span>
+            <h3>Registrar Nueva Jornada</h3>
+            
+            <form id="formulario-registro">
+                <div class="campo">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" required>
+                </div>
+
+                <div class="fila-doble">
+                    <div class="campo">
+                        <label for="hora-llegada">Hora de llegada:</label>
+                        <input type="time" id="hora-llegada" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="hora-salida">Hora de salida:</label>
+                        <input type="time" id="hora-salida" required>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="tipo-actividad">Tipo de actividad:</label>
+                    <select id="tipo-actividad" required>
+                        <option value="">-- Selecciona una opción --</option>
+                        <option value="Trabajo de Campo / Ganadería">Trabajo de Campo / Ganadería</option>
+                        <option value="Captura / Control de Datos">Captura / Control de Datos</option>
+                        <option value="Monitoreo Epidemiológico / Vectorial">Monitoreo Epidemiológico / Vectorial</option>
+                        <option value="Elaboración de Reportes / Mapas">Elaboración de Reportes / Mapas</option>
+                        <option value="Administrativo / Soporte">Administrativo / Soporte</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="lugar">Lugar / Ubicación:</label>
+                    <input type="text" id="lugar" placeholder="Ej: Oficina central, Rancho El Triunfo..." required>
+                </div>
+
+                <div class="campo">
+                    <label for="descripcion">Descripción de lo realizado:</label>
+                    <textarea id="descripcion" rows="2" placeholder="Detalla brevemente el trabajo realizado..." required></textarea>
+                </div>
+
+                <div class="campo">
+                    <label for="evidencia">Evidencia (Nombre de archivo o enlace):</label>
+                    <input type="text" id="evidencia" placeholder="Ej: reporte_01.pdf o foto_campo.jpg">
+                </div>
+
+                <button type="submit" class="boton-guardar">Guardar Jornada</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
